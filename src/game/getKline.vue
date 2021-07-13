@@ -1,78 +1,121 @@
 <template>
-  <el-dialog title="获取K线" :visible.sync="visible" @close="DialogClose" width="500px">
-    <!-- <el-form ref="form" :model="form" label-width="80px">
-      <el-form-item label="活动名称">
-        <el-input v-model="form.name"></el-input>
+  <el-dialog title="获取K线" :visible.sync="visible" @close="DialogClose" width="450px">
+    <el-alert title="因为无法解决跨域问题，只能d打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据" type="success" :closable="false" style="margin-bottom:10px;"></el-alert>
+    <el-form ref="form" :model="form" :rules="dataRule" label-width="80px" style="width:300px;">
+      <el-form-item label="股票代码" prop="symbol">
+        <el-input v-model="form.symbol" maxlength="8" show-word-limit placeholder="字母需大写"></el-input>
       </el-form-item>
-      <el-form-item label="活动区域">
-        <el-select v-model="form.region" placeholder="请选择活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
+      <el-form-item label="最后时间" prop="begin">
+        <el-date-picker
+          type="date"
+          placeholder="选择日期"
+          v-model="form.begin"
+          value-format="timestamp"
+          style="width: 100%;"
+        ></el-date-picker>
       </el-form-item>
-      <el-form-item label="活动时间">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="即时配送">
-        <el-switch v-model="form.delivery"></el-switch>
-      </el-form-item>
-      <el-form-item label="活动性质">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
-          <el-checkbox label="地推活动" name="type"></el-checkbox>
-          <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-          <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="特殊资源">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="线上品牌商赞助"></el-radio>
-          <el-radio label="线下场地免费"></el-radio>
+      <el-form-item label="复权类型">
+        <el-radio-group v-model="form.type">
+          <el-radio-button size="small" label="before">前复权</el-radio-button>
+          <el-radio-button size="small" label="after">后复权</el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="活动形式">
-        <el-input type="textarea" v-model="form.desc"></el-input>
+      <el-form-item label="选择周期">
+        <el-radio-group v-model="form.period">
+          <el-radio-button size="small" label="day">日</el-radio-button>
+          <el-radio-button size="small" label="week">周</el-radio-button>
+          <el-radio-button size="small" label="month">月</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="周期数量">
+        <el-input-number v-model="form.count" :min="100" :max="2500"></el-input-number>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">立即创建</el-button>
-        <el-button>取消</el-button>
+        <el-button type="primary" @click="getData()">提交</el-button>
+        <el-button @click="DialogClose()">取消</el-button>
       </el-form-item>
-    </el-form> -->
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="DialogClose">取 消</el-button>
-      <el-button type="primary" @click="DialogClose">确 定</el-button>
-    </span>
+    </el-form>
+    <el-divider content-position="left"></el-divider>
+    <el-upload
+      class="upload-demo"
+      accept=".json"
+      :on-change="changeFile"
+      :auto-upload="false"
+      action
+    >
+      <el-button size="small" type="primary">点击读取</el-button>
+      <div slot="tip" class="el-upload__tip">读取已下载的json文件，只能读取json文件</div>
+    </el-upload>
   </el-dialog>
 </template>
 
 <script>
 export default {
-    name: "getKlineDialog",
-    props: {
-        KlineDialogVisible: {
-            default: false
-        },
+  name: "getKlineDialog",
+  data() {
+    return {
+      form: {
+        symbol: 'SH000001',
+        begin: 1625932800000,
+        type: 'before',
+        count: 500,
+        period: 'day',
+      },
+      dataRule: {
+        symbol: [
+          { required: true, message: '代码不能为空', trigger: 'blur' },
+          { min: 8, max: 8, message: '长度为8个字符', trigger: 'blur' }
+        ],
+        begin: [
+          { required: true, message: '日期不能为空', trigger: 'blur' }
+        ]
+      },
+      visible: false
+    };
+  },
+  methods: {
+    init() {
+      this.visible = true
+      // window.open('https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SH000001&begin=1623643743317&period=day&type=before&count=-500&indicator=kline');
+
     },
-    data() {
-        return {
-            visible: false
-        };
+    DialogClose() {
+      this.visible = false
     },
-    methods: {
-        DialogClose() {
-            this.$emit("update:KlineDialogVisible", false);
+    getData() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          window.open(`https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=${this.form.symbol}&begin=${this.form.begin}&period=${this.form.period}&type=${this.form.type}&count=-${this.form.count}&indicator=kline`);
+          console.log(this.form)
         }
+      })
     },
-    watch: {
-        KlineDialogVisible() {
-            this.visible = this.KlineDialogVisible;
-        },
-    }
+    changeFile(file) {
+      var reader = new FileReader()
+      reader.onload = async (e) => {
+        try {
+          let document = JSON.parse(e.target.result)
+          console.log(document)
+          if (document.error_code == 0) {
+            this.$message({
+              message: '读取成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.visible = false
+                this.$emit('getData', document)
+              }
+            })
+          } else {
+            this.$message.error('数据有问题')
+          }
+        } catch (err) {
+          console.log(`load JSON document from file error: ${err.message}`)
+          this.showSnackbar(`Load JSON document from file error: ${err.message}`, 4000)
+        }
+      }
+      reader.readAsText(file.raw)
+    },
+  },
 };
 </script>
