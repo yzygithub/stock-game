@@ -38,6 +38,7 @@ export class Chart {
     }
 
     updateDataAndDisplay(newData) {
+        console.log('updateDataAndDisplay')
         Kline.instance.symbol = this._symbol;
         Kline.instance.range = this._range;
         /**

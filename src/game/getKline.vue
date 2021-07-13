@@ -100,7 +100,7 @@ export default {
             this.$message({
               message: '读取成功',
               type: 'success',
-              duration: 1500,
+              duration: 800,
               onClose: () => {
                 this.visible = false
                 this.$emit('getData', document)

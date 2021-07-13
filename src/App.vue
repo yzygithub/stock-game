@@ -35,7 +35,7 @@ header {
 
 <script>
 import VueKline from "./kline/kline";
-import { Control } from './kline/js/control';
+import { Chart } from './kline/js/chart'
 import getKlineDialog from "./game/getKline"
 export default {
   name: "stock-game",
@@ -54,7 +54,7 @@ export default {
         ranges: ["1w", "1d", "line"],
         symbol: "",
         symbolName: "",
-        intervalTime: 5000,
+        intervalTime: 50000,
         depthWidth: 50,
         count: 1
       },
@@ -641,7 +641,7 @@ export default {
         },
         "error_code": 0,
         "error_description": ""
-      }
+      },
     };
   },
   created() {
@@ -650,7 +650,7 @@ export default {
     this.klineParams.height = height - 60
     this.klineParams.width = width - 2
     this.klineParams.symbolName = this.rawData.data.symbol
-    // this.handleRawData()
+    this.handleRawData()
   },
   mounted() {
   },
@@ -673,6 +673,10 @@ export default {
           }
         }
         console.log(this.klineData)
+        const newData = this.klineData.data.lines
+        var chart = new Chart()
+        chart.updateDataAndDisplay(newData)
+        // chart.setSymbol(this.klineParams.symbol);
       } else {
         this.$message.error('数据有问题')
       }

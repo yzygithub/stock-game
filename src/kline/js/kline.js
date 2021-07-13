@@ -22,7 +22,7 @@ export default class Kline {
         this.url = "";
         this.count = 2;
         this.limit = 1000;
-        this.intervalTime = 5000;
+        this.intervalTime = 50000;
         this.debug = true;
         this.language = "zh-cn";
         this.theme = "dark";
