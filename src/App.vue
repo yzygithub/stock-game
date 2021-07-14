@@ -4,7 +4,7 @@
       <el-row>
         <el-button size="small" type="primary" @click="KlineDialogHandle()">获取K线</el-button>
         <el-button size="small" type="success">交易</el-button>
-        <el-button size="small" type="info">观望</el-button>
+        <el-button size="small" type="info" @click="passOne()">观望</el-button>
         <el-button size="small" type="warning">结算</el-button>
       </el-row>
     </header>
@@ -67,6 +67,8 @@ export default {
       },
       KlineDialogVisible: false,
       rawData: {},
+      newList: [],
+      position: 250
     };
   },
   created() {
@@ -78,22 +80,21 @@ export default {
   methods: {
     handleRawData(data) {
       this.rawData = data
+      this.position = 250
       console.log(this.rawData)
       if (this.rawData.error_code == 0) {
-        var newList = this.rawData.data.item.map(function (item) {
+        this.newList = this.rawData.data.item.map(function (item) {
           var newItem = item.slice(0, 6)
           var volume = parseFloat((newItem[1] / 1000000).toFixed(2))
           newItem.splice(1, 1)
           newItem.push(volume)
           return newItem
         })
-        this.klineData = {
-          success: true,
-          data: {
-            lines: newList
-          }
+        if (this.newList.length > this.position){
+          this.klineData.data.lines = this.newList.slice(0,this.position+1)
+        } else {
+          this.klineData.data.lines = this.newList
         }
-        console.log(this.klineData)
         this.updateDisplay()
       } else {
         this.$message.error('数据有问题')
@@ -105,11 +106,20 @@ export default {
         this.$refs.getKlineDialog.init()
       })
     },
+    passOne() {
+      if (this.newList.length > this.position) {
+        this.position += 1
+        this.klineData.data.lines = this.newList.slice(0,this.position+1)
+        this.updateDisplay()
+      } else {
+        this.$message.error('K线已到尽头')
+      }
+    },
     updateDisplay() {
       const newData = this.klineData.data.lines
       var chart = new Chart()
       chart.updateDataAndDisplay(newData)
-      chart.updateDataAndDisplay(newData) //不优雅的解决一个vue-kline自带的bug
+      // chart.updateDataAndDisplay(newData) //不优雅的解决一个vue-kline自带的bug
     }
   }
 }
