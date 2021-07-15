@@ -2,10 +2,10 @@
   <el-dialog title="获取K线" :visible.sync="visible" @close="DialogClose" width="450px">
     <el-alert title="因为无法解决跨域问题，只能d打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据" type="success" :closable="false" style="margin-bottom:10px;"></el-alert>
     <el-form ref="form" :model="form" :rules="dataRule" label-width="80px" style="width:300px;">
-      <el-form-item label="股票代码" prop="symbol">
+      <el-form-item size="small" label="股票代码" prop="symbol">
         <el-input v-model="form.symbol" maxlength="8" show-word-limit placeholder="字母需大写"></el-input>
       </el-form-item>
-      <el-form-item label="最后时间" prop="begin">
+      <el-form-item size="small" label="最后时间" prop="begin">
         <el-date-picker
           type="date"
           placeholder="选择日期"
@@ -15,19 +15,19 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="复权类型">
-        <el-radio-group v-model="form.type">
-          <el-radio-button size="small" label="before">前复权</el-radio-button>
-          <el-radio-button size="small" label="after">后复权</el-radio-button>
+        <el-radio-group size="small" v-model="form.type">
+          <el-radio-button label="before">前复权</el-radio-button>
+          <el-radio-button label="after">后复权</el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择周期">
-        <el-radio-group v-model="form.period">
-          <el-radio-button size="small" label="day">日</el-radio-button>
-          <el-radio-button size="small" label="week">周</el-radio-button>
-          <el-radio-button size="small" label="month">月</el-radio-button>
+        <el-radio-group size="small" v-model="form.period">
+          <el-radio-button label="day">日</el-radio-button>
+          <el-radio-button label="week">周</el-radio-button>
+          <el-radio-button label="month">月</el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="周期数量">
+      <el-form-item size="small" label="周期数量">
         <el-input-number v-model="form.count" :min="100" :max="2500"></el-input-number>
       </el-form-item>
       <el-form-item>

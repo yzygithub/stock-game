@@ -6,6 +6,7 @@
         <el-button size="small" type="success" @click="tradeDialogHandle()">交易</el-button>
         <el-button size="small" type="info" @click="passOne()">观望</el-button>
         <el-button size="small" type="warning">结算</el-button>
+        <el-button size="small" type="info" plain class="right" @click="readmeDialogHandle()">说明</el-button>
       </el-row>
     </header>
     <main id="main">
@@ -15,6 +16,7 @@
     <get-Kline-Dialog ref="getKlineDialog" v-if="KlineDialogVisible" @getData="handleRawData"></get-Kline-Dialog>
     <!-- 交易 dialog -->
     <trade-Dialog ref="tradeDialog" v-if="tradeDialogVisible" ></trade-Dialog>
+    <readme-Dialog ref="readmeDialog" v-if="readmeDialogVisible" ></readme-Dialog>
   </div>
 </template>
 
@@ -33,6 +35,9 @@ header {
   padding: 10px;
   background-color: #f6f6f6;
 }
+.right {
+  float: right;
+}
 </style>
 
 <script>
@@ -40,12 +45,14 @@ import VueKline from "./kline/kline";
 import { Chart } from './kline/js/chart'
 import getKlineDialog from "./game/getKlineDialog"
 import tradeDialog from "./game/tradeDialog"
+import readmeDialog from "./game/readmeDialog"
 export default {
   name: "stock-game",
   components: {
     VueKline,
     getKlineDialog,
-    tradeDialog
+    tradeDialog,
+    readmeDialog
   },
   data() {
     return {
@@ -71,6 +78,7 @@ export default {
       },
       KlineDialogVisible: false,
       tradeDialogVisible: false,
+      readmeDialogVisible:false,
       rawData: {},
       newList: [],
       position: 250
@@ -115,6 +123,12 @@ export default {
       this.tradeDialogVisible = true
       this.$nextTick(() => {
         this.$refs.tradeDialog.init()
+      })
+    },
+    readmeDialogHandle() {
+      this.readmeDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.readmeDialog.init()
       })
     },
     passOne() {
