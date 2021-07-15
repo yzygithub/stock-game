@@ -2,6 +2,9 @@
   <el-dialog title="说明" :visible.sync="visible" @close="DialogClose" width="500px">
  <div>
    <p>
+     获取股票数据是用的雪球的接口，但是因为跨域问题无法解决，只能手动保存数据。
+   </p>
+   <p>
      滑点0.01 手续费万分之2.5 印花税千分之1
    </p>
    <p>

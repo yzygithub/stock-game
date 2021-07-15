@@ -13,6 +13,13 @@
           <div class="title2">可用资金:{{cash}}</div>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="8">
+          <div class="title2">仓位:{{totalPosition}}%</div>
+        </el-col>
+        <el-col :span="8"></el-col>
+        <el-col :span="8"></el-col>
+      </el-row>
     </div>
     <div>
       <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
@@ -100,6 +107,7 @@ export default {
       priceNow: null,
       positionNow: 0,
       position: null,
+      totalPosition: 0,
       maxPosition: null,
       orderAmount: '--',
       fee: '--',
@@ -132,6 +140,7 @@ export default {
     },
     DialogClose() {
       this.visible = false
+      this.$emit('getrateData', this.calcProfitRate())
     },
     handleClick() {
       this.position = null
@@ -178,6 +187,9 @@ export default {
           this.$message.error('可用持仓数量不足')
         }
       }
+    },
+    calcProfitRate() {
+      return ((this.totalCapital / this.initCapital -1)*100).toFixed(1)
     }
   },
   watch: {
