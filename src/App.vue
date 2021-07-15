@@ -5,7 +5,7 @@
         <el-button size="small" type="primary" @click="KlineDialogHandle()">获取K线</el-button>
         <el-button size="small" type="success" @click="tradeDialogHandle()">交易</el-button>
         <el-button size="small" type="info" @click="passOne()">观望</el-button>
-        <el-button size="small" type="warning">结算</el-button>
+        <el-button size="small" type="warning"  @click="settleDialogHandle()">结算</el-button>
         <el-button size="small" type="info" plain class="right" @click="readmeDialogHandle()">说明</el-button>
       </el-row>
     </header>
@@ -17,6 +17,7 @@
     <!-- 交易 dialog -->
     <trade-Dialog ref="tradeDialog" v-if="tradeDialogVisible" ></trade-Dialog>
     <readme-Dialog ref="readmeDialog" v-if="readmeDialogVisible" ></readme-Dialog>
+    <settle-Dialog ref="settleDialog" v-if="settleDialogVisible" ></settle-Dialog>
   </div>
 </template>
 
@@ -46,13 +47,15 @@ import { Chart } from './kline/js/chart'
 import getKlineDialog from "./game/getKlineDialog"
 import tradeDialog from "./game/tradeDialog"
 import readmeDialog from "./game/readmeDialog"
+import settleDialog from "./game/settleDialog"
 export default {
   name: "stock-game",
   components: {
     VueKline,
     getKlineDialog,
     tradeDialog,
-    readmeDialog
+    readmeDialog,
+    settleDialog
   },
   data() {
     return {
@@ -79,10 +82,13 @@ export default {
       KlineDialogVisible: false,
       tradeDialogVisible: false,
       readmeDialogVisible:false,
+      settleDialogVisible:false,
       rawData: {},
       newList: [],
       position: 250,
+      priceStart:null,
       priceNow: null,
+      tradeCount: 0,
     };
   },
   created() {
@@ -114,6 +120,8 @@ export default {
         this.$nextTick(() => {
           this.$refs.tradeDialog.reset()
         })
+        const arr = this.klineData.data.lines
+        this.priceStart = arr[arr.length-1][4]
       } else {
         this.$message.error('数据有问题')
       }
@@ -136,9 +144,16 @@ export default {
         this.$refs.readmeDialog.init()
       })
     },
+    settleDialogHandle() {
+      this.settleDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.settleDialog.init()
+      })
+    },
     passOne() {
       if (this.newList.length > this.position) {
         this.position += 1
+        this.tradeCount +=1
         this.klineData.data.lines = this.newList.slice(0,this.position+1)
         this.updateDisplay()
       } else {
@@ -155,7 +170,7 @@ export default {
     getNewPrice() {
       const arr = this.klineData.data.lines
       this.priceNow = arr[arr.length-1][4]
-      console.log(this.priceNow)
+      // console.log(this.priceNow)
     }
   }
 }

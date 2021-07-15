@@ -45,7 +45,7 @@
               label="仓位"
             ></el-input-number>
             <label class="tip">最多可卖{{positionNow}}</label>
-            <div class="info">订单金额：{{orderAmount}} 手续费：{{fee}} 可用资金：{{cashLeft}}</div>
+            <div class="info">订单金额：{{orderAmount}} | 手续费：{{fee}} | 可用资金：{{cashLeft}}</div>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -104,31 +104,31 @@ export default {
       orderAmount: '--',
       fee: '--',
       cashLeft: 1000000,
-      // slippage: 0.01,
-      c_rate: 2.5/10000,
-      t_rate: 1/1000
+      slippage: 0.01,
+      c_rate: 2.5 / 10000,
+      t_rate: 1 / 1000
     };
   },
   methods: {
-    init(price,reset) {
+    init(price, reset) {
       this.visible = true
       this.priceNow = parseFloat(price.toFixed(2))
-      this.marketValue = this.positionNow*this.priceNow
-      this.totalCapital = this.marketValue+this.cash
+      this.marketValue = this.positionNow * this.priceNow
+      this.totalCapital = this.marketValue + this.cash
       this.FPL = parseFloat((this.totalCapital - this.initCapital).toFixed(2))
     },
     reset() {
-        this.totalCapital= 1000000
-        this.marketValue= 0
-        this.FPL= 0
-        this.cash= 1000000
-        this.priceNow= null
-        this.positionNow= 0
-        this.position= null
-        this.maxPosition= null
-        this.orderAmount= '--'
-        this.fee= '--'
-        this.cashLeft= 1000000
+      this.totalCapital = 1000000
+      this.marketValue = 0
+      this.FPL = 0
+      this.cash = 1000000
+      this.priceNow = null
+      this.positionNow = 0
+      this.position = null
+      this.maxPosition = null
+      this.orderAmount = '--'
+      this.fee = '--'
+      this.cashLeft = 1000000
     },
     DialogClose() {
       this.visible = false
@@ -141,23 +141,42 @@ export default {
         if (this.cashLeft > 0) {
           this.positionNow += this.position
           this.marketValue += this.orderAmount
-          this.FPL -= this.fee
-          this.totalCapital = parseFloat((this.totalCapital-this.fee).toFixed(2))
+          const loss = this.fee + this.slippage * this.position
+          this.FPL -= loss
+          this.totalCapital = parseFloat((this.totalCapital - this.fee - loss).toFixed(2))
           this.cash = this.cashLeft
           this.position = null
           this.$message({
-              message: '交易成功',
-              type: 'success',
-              duration: 1000,
-              onClose: () => {
-                this.visible = false
-              }
-            })
+            message: '交易成功',
+            type: 'success',
+            duration: 1000,
+            onClose: () => {
+              this.visible = false
+            }
+          })
         } else {
-        this.$message.error('可用资金不足')
+          this.$message.error('可用资金不足')
         }
       } else if (this.activeName == 'sell') {
-
+        if (this.position <= this.positionNow) {
+          this.positionNow -= this.position
+          this.marketValue += this.positionNow * this.priceNow
+          const loss = this.fee + this.slippage * this.position
+          this.FPL -= loss
+          this.totalCapital = parseFloat((this.totalCapital - this.fee - loss).toFixed(2))
+          this.cash = this.cashLeft
+          this.position = null
+          this.$message({
+            message: '交易成功',
+            type: 'success',
+            duration: 1000,
+            onClose: () => {
+              this.visible = false
+            }
+          })
+        } else {
+          this.$message.error('可用持仓数量不足')
+        }
       }
     }
   },
@@ -173,18 +192,33 @@ export default {
       this.totalCapital = this.marketValue + this.cash
     },
     position(pos) {
-      // 订单金额
-      // this.orderAmount = parseFloat(((this.priceNow + this.slippage) * pos).toFixed(2))
-      this.orderAmount = parseFloat((this.priceNow * pos).toFixed(2))
-      // 手续费
-      var f = parseFloat((this.orderAmount * this.c_rate).toFixed(2))
-      if (f < 5) {
-        this.fee = 5
+      if (this.activeName == 'buy') {
+        // 订单金额
+        this.orderAmount = parseFloat(((this.priceNow + this.slippage) * pos).toFixed(2))
+        // 手续费
+        var f = parseFloat((this.orderAmount * this.c_rate).toFixed(2))
+        if (f < 5) {
+          this.fee = 5
+        } else {
+          this.fee = f
+        }
+        // 可用资金-买入
+        this.cashLeft = parseFloat((this.cash - this.fee - this.orderAmount).toFixed(2))
       } else {
-        this.fee = f
+        // 订单金额
+        this.orderAmount = parseFloat(((this.priceNow - this.slippage) * pos).toFixed(2))
+        // 手续费
+        var f = parseFloat((this.orderAmount * this.c_rate).toFixed(2))
+        var t = parseFloat((this.orderAmount * this.t_rate).toFixed(2))
+        if (f < 5) {
+          this.fee = 5 + t
+        } else {
+          this.fee = f + t
+        }
+        this.fee = parseFloat(this.fee.toFixed(2))
+        // 可用资金-买入
+        this.cashLeft = parseFloat((this.cash - this.fee + this.orderAmount).toFixed(2))
       }
-      // 可用资金-买入
-      this.cashLeft = parseFloat((this.cash - this.fee - this.orderAmount).toFixed(2))
     }
   }
 };
