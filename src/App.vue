@@ -73,7 +73,7 @@ export default {
         success: true,
         data: {
           lines: [
-            [15121452e5, 91.29, 91.29, 91.29, 91.29, 0],
+            [0,1.11, 1.11, 1.11, 1.11, 0],
           ]        }
       },
       KlineDialogVisible: false,
@@ -81,7 +81,8 @@ export default {
       readmeDialogVisible:false,
       rawData: {},
       newList: [],
-      position: 250
+      position: 250,
+      priceNow: null,
     };
   },
   created() {
@@ -109,6 +110,10 @@ export default {
           this.klineData.data.lines = this.newList
         }
         this.updateDisplay()
+        // 重置交易信息
+        this.$nextTick(() => {
+          this.$refs.tradeDialog.reset()
+        })
       } else {
         this.$message.error('数据有问题')
       }
@@ -122,7 +127,7 @@ export default {
     tradeDialogHandle() {
       this.tradeDialogVisible = true
       this.$nextTick(() => {
-        this.$refs.tradeDialog.init()
+        this.$refs.tradeDialog.init(this.priceNow)
       })
     },
     readmeDialogHandle() {
@@ -144,7 +149,13 @@ export default {
       const newData = this.klineData.data.lines
       var chart = new Chart()
       chart.updateDataAndDisplay(newData)
+      this.getNewPrice()
       // chart.updateDataAndDisplay(newData) //不优雅的解决一个vue-kline自带的bug
+    },
+    getNewPrice() {
+      const arr = this.klineData.data.lines
+      this.priceNow = arr[arr.length-1][4]
+      console.log(this.priceNow)
     }
   }
 }
