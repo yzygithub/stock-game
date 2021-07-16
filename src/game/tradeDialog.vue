@@ -15,10 +15,14 @@
       </el-row>
       <el-row>
         <el-col :span="8">
+          <div class="title2">平均成本:{{avarageCost}}</div>
+        </el-col>
+        <el-col :span="8">
           <div class="title2">仓位:{{totalPosition}}%</div>
         </el-col>
-        <el-col :span="8"></el-col>
-        <el-col :span="8"></el-col>
+        <el-col :span="8">
+          <div class="title2">总手续费:{{totalFee}}</div>
+        </el-col>
       </el-row>
     </div>
     <div>
@@ -108,6 +112,8 @@ export default {
       positionNow: 0,
       position: null,
       totalPosition: 0,
+      avarageCost: 0,
+      totalFee: 0,
       maxPosition: null,
       orderAmount: '--',
       fee: '--',
@@ -118,12 +124,14 @@ export default {
     };
   },
   methods: {
-    init(price, reset) {
+    init(price) {
       this.visible = true
       this.priceNow = parseFloat(price.toFixed(2))
-      this.marketValue = this.positionNow * this.priceNow
-      this.totalCapital = this.marketValue + this.cash
+      this.maxPosition = Math.floor(this.cash / (this.priceNow * 100)) * 100
+      this.marketValue = parseFloat((this.positionNow * this.priceNow).toFixed(2))
+      this.totalCapital = parseFloat(this.marketValue + this.cash).toFixed(2)
       this.FPL = parseFloat((this.totalCapital - this.initCapital).toFixed(2))
+      this.calcTotalPosition()
     },
     reset() {
       this.totalCapital = 1000000
@@ -134,6 +142,9 @@ export default {
       this.positionNow = 0
       this.position = null
       this.maxPosition = null
+      this.totalPosition = 0
+      this.avarageCost = 0
+      this.totalFee = 0
       this.orderAmount = '--'
       this.fee = '--'
       this.cashLeft = 1000000
@@ -152,13 +163,15 @@ export default {
           this.marketValue += this.orderAmount
           const loss = this.fee + this.slippage * this.position
           this.FPL -= loss
+          this.totalFee = this.floatFix2(this.totalFee + this.fee)
           this.totalCapital = parseFloat((this.totalCapital - this.fee - loss).toFixed(2))
           this.cash = this.cashLeft
           this.position = null
+          this.calcTotalPosition()
           this.$message({
             message: '交易成功',
             type: 'success',
-            duration: 1000,
+            duration: 1500,
             onClose: () => {
               this.visible = false
             }
@@ -169,16 +182,18 @@ export default {
       } else if (this.activeName == 'sell') {
         if (this.position <= this.positionNow) {
           this.positionNow -= this.position
-          this.marketValue += this.positionNow * this.priceNow
+          this.marketValue -= this.positionNow * this.priceNow
           const loss = this.fee + this.slippage * this.position
           this.FPL -= loss
+          this.totalFee = this.floatFix2(this.totalFee + this.fee)          
           this.totalCapital = parseFloat((this.totalCapital - this.fee - loss).toFixed(2))
           this.cash = this.cashLeft
           this.position = null
+          this.calcTotalPosition()
           this.$message({
             message: '交易成功',
             type: 'success',
-            duration: 1000,
+            duration: 1500,
             onClose: () => {
               this.visible = false
             }
@@ -189,20 +204,17 @@ export default {
       }
     },
     calcProfitRate() {
-      return ((this.totalCapital / this.initCapital -1)*100).toFixed(1)
+      return ((this.totalCapital / this.initCapital - 1) * 100).toFixed(1)
+    },
+    calcTotalPosition() {
+      this.totalPosition = (this.marketValue * 100 / this.totalCapital).toFixed(1)
+    },
+    floatFix2(num) {
+      return parseFloat(num.toFixed(2))
     }
   },
+
   watch: {
-    priceNow(newPrice) {
-      var pos = this.cash / (newPrice * 100)
-      console.log(pos)
-      // 最多可买
-      this.maxPosition = Math.floor(pos) * 100
-      // 持有市值
-      this.marketValue = parseFloat((this.positionNow * newPrice).toFixed(2))
-      // 总资产
-      this.totalCapital = this.marketValue + this.cash
-    },
     position(pos) {
       if (this.activeName == 'buy') {
         // 订单金额
