@@ -123,6 +123,7 @@ export default {
         })
         const arr = this.klineData.data.lines
         this.priceStart = arr[arr.length - 1][4]
+        this.tradeCount = 0
       } else {
         this.$message.error('数据有问题')
       }

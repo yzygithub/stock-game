@@ -40,8 +40,23 @@
               label="仓位"
             ></el-input-number>
             <label class="tip">最多可买{{maxPosition}}</label>
-            <div class="info">订单金额：{{orderAmount}} | 手续费：{{fee}} | 可用资金：{{cashLeft}}</div>
+            <div class="ratio">
+              <el-radio-group @change="changPos" v-model="posProp" size="mini">
+                <el-radio-button label="0.25">1/4</el-radio-button>
+                <el-radio-button label="0.5">1/2</el-radio-button>
+                <el-radio-button label="1">全仓</el-radio-button>
+              </el-radio-group>
+              <el-button
+                size="mini"
+                type="primary"
+                plain
+                icon="el-icon-close"
+                circle
+                @click="canclePosProp"
+              ></el-button>
+            </div>
           </div>
+          <div class="info">订单金额：{{orderAmount}} | 手续费：{{fee}} | 可用资金：{{cashLeft}}</div>
         </el-tab-pane>
         <el-tab-pane label="卖出" name="sell">
           <div class="trade">价格 : {{priceNow}}</div>
@@ -56,8 +71,23 @@
               label="仓位"
             ></el-input-number>
             <label class="tip">最多可卖{{positionNow}}</label>
-            <div class="info">订单金额：{{orderAmount}} | 手续费：{{fee}} | 可用资金：{{cashLeft}}</div>
+            <div class="ratio">
+              <el-radio-group @change="changPos" v-model="posProp" size="mini">
+                <el-radio-button label="0.25">1/4</el-radio-button>
+                <el-radio-button label="0.5">1/2</el-radio-button>
+                <el-radio-button label="1">全仓</el-radio-button>
+              </el-radio-group>
+              <el-button
+                size="mini"
+                type="primary"
+                plain
+                icon="el-icon-close"
+                circle
+                @click="canclePosProp"
+              ></el-button>
+            </div>
           </div>
+          <div class="info">订单金额：{{orderAmount}} | 手续费：{{fee}} | 可用资金：{{cashLeft}}</div>
         </el-tab-pane>
       </el-tabs>
       <el-button style="margin-top:15px;" type="primary" @click="trade()">确定</el-button>
@@ -94,6 +124,9 @@
   margin-top: 10px;
   font-size: 14px;
 }
+.ratio {
+  margin-top: 5px;
+}
 </style>
 
 <script>
@@ -111,6 +144,7 @@ export default {
       priceNow: null,
       positionNow: 0,
       position: null,
+      posProp: null,
       totalPosition: 0,
       avarageCost: 0,
       totalFee: 0,
@@ -141,6 +175,7 @@ export default {
       this.priceNow = null
       this.positionNow = 0
       this.position = null
+      this.posProp = null
       this.maxPosition = null
       this.totalPosition = 0
       this.avarageCost = 0
@@ -155,6 +190,7 @@ export default {
     },
     handleClick() {
       this.position = null
+      this.posProp = null
     },
     trade() {
       if (this.activeName == 'buy') {
@@ -185,7 +221,7 @@ export default {
           this.marketValue -= this.positionNow * this.priceNow
           const loss = this.fee + this.slippage * this.position
           this.FPL -= loss
-          this.totalFee = this.floatFix2(this.totalFee + this.fee)          
+          this.totalFee = this.floatFix2(this.totalFee + this.fee)
           this.totalCapital = parseFloat((this.totalCapital - this.fee - loss).toFixed(2))
           this.cash = this.cashLeft
           this.position = null
@@ -202,6 +238,17 @@ export default {
           this.$message.error('可用持仓数量不足')
         }
       }
+    },
+    changPos(pos) {
+      if (this.activeName == 'buy') {
+        this.position = Math.floor(this.maxPosition * parseFloat(pos))
+      } else if (this.activeName == 'sell') {
+        this.position = Math.floor(this.positionNow * parseFloat(pos))
+      }
+    },
+    canclePosProp() {
+      this.posProp = null
+      this.position = 100
     },
     calcProfitRate() {
       return ((this.totalCapital / this.initCapital - 1) * 100).toFixed(1)
