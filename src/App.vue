@@ -113,10 +113,10 @@ export default {
         })
         if (this.newList.length > 700) {
           this.position = Math.round(Math.random() * (300) + 200)
-          this.klineData.data.lines = this.newList.slice(0, this.position+1)
+          this.klineData.data.lines = this.newList.slice(0, this.position + 1)
         } else if (700 > this.newList.length > 400) {
           this.position = Math.round(Math.random() * (this.newList.length - 400) + 200)
-          this.klineData.data.lines = this.newList.slice(0, this.position+1)
+          this.klineData.data.lines = this.newList.slice(0, this.position + 1)
         } else if (this.newList.length > this.position) {
           this.klineData.data.lines = this.newList.slice(0, this.position + 1)
         } else {
@@ -159,6 +159,9 @@ export default {
     settleDialogHandle() {
       this.settleDialogVisible = true
       const change = ((this.priceNow / this.priceStart - 1) * 100).toFixed(1)
+      this.$nextTick(() => {
+        this.$refs.tradeDialog.sendProfitRate(this.priceNow)
+      })
       this.$nextTick(() => {
         this.$refs.settleDialog.init(this.tradeCount, change, this.profitRate)
       })

@@ -196,7 +196,6 @@ export default {
     },
     DialogClose() {
       this.visible = false
-      this.$emit('getrateData', this.calcProfitRate())
     },
     handleClick() {
       this.position = null
@@ -268,6 +267,12 @@ export default {
     },
     floatFix2(num) {
       return parseFloat(num.toFixed(2))
+    },
+    sendProfitRate(price) {
+      this.priceNow = price
+      this.marketValue = parseFloat((this.positionNow * this.priceNow).toFixed(2))
+      this.totalCapital = parseFloat(this.marketValue + this.cash).toFixed(2)
+      this.$emit('getrateData', this.calcProfitRate())
     }
   },
 
