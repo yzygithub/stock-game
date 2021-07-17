@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="获取K线" :visible.sync="visible" @close="DialogClose" width="450px">
     <el-alert
-      title="因为无法解决跨域问题，只能d打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据"
+      title="因为无法解决跨域问题，只能打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据"
       type="success"
       :closable="false"
       style="margin-bottom:10px;"
@@ -33,7 +33,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item size="small" label="周期数量">
-        <el-input-number v-model="form.count" :min="100" :max="2500"></el-input-number>
+        <el-input-number v-model="form.count" :min="100" :max="5000"></el-input-number>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getData()">提交</el-button>

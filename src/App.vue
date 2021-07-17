@@ -111,7 +111,13 @@ export default {
           newItem.push(volume)
           return newItem
         })
-        if (this.newList.length > this.position) {
+        if (this.newList.length > 700) {
+          this.position = Math.round(Math.random() * (300) + 200)
+          this.klineData.data.lines = this.newList.slice(0, this.position+1)
+        } else if (700 > this.newList.length > 400) {
+          this.position = Math.round(Math.random() * (this.newList.length - 400) + 200)
+          this.klineData.data.lines = this.newList.slice(0, this.position+1)
+        } else if (this.newList.length > this.position) {
           this.klineData.data.lines = this.newList.slice(0, this.position + 1)
         } else {
           this.klineData.data.lines = this.newList
@@ -172,8 +178,8 @@ export default {
       const newData = this.klineData.data.lines
       var chart = new Chart()
       chart.updateDataAndDisplay(newData)
-      this.getNewPrice()
       // chart.updateDataAndDisplay(newData) //不优雅的解决一个vue-kline自带的bug
+      this.getNewPrice()
     },
     getNewPrice() {
       const arr = this.klineData.data.lines

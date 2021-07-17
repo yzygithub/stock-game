@@ -1031,8 +1031,8 @@ const VueKline = {
           />
           <span
             name="chart_str_period_line"
-            zh_tw="分時"
-            zh_cn="分时"
+            zh_tw="收盤線"
+            zh_cn="收盘线"
             en_us="Line"
           />
           <span

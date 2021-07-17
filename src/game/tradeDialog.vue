@@ -44,6 +44,7 @@
               <el-radio-group @change="changPos" v-model="posProp" size="mini">
                 <el-radio-button label="0.25">1/4</el-radio-button>
                 <el-radio-button label="0.5">1/2</el-radio-button>
+                <el-radio-button label="0.75">3/4</el-radio-button>
                 <el-radio-button label="1">全仓</el-radio-button>
               </el-radio-group>
               <el-button
@@ -75,6 +76,7 @@
               <el-radio-group @change="changPos" v-model="posProp" size="mini">
                 <el-radio-button label="0.25">1/4</el-radio-button>
                 <el-radio-button label="0.5">1/2</el-radio-button>
+                <el-radio-button label="0.75">3/4</el-radio-button>
                 <el-radio-button label="1">全仓</el-radio-button>
               </el-radio-group>
               <el-button
@@ -140,6 +142,7 @@ export default {
       totalCapital: 1000000,
       marketValue: 0,
       FPL: 0,
+      lastFPL: 0,
       cash: 1000000,
       priceNow: null,
       positionNow: 0,
@@ -165,12 +168,19 @@ export default {
       this.marketValue = parseFloat((this.positionNow * this.priceNow).toFixed(2))
       this.totalCapital = parseFloat(this.marketValue + this.cash).toFixed(2)
       this.FPL = parseFloat((this.totalCapital - this.initCapital).toFixed(2))
+      if (this.positionNow) {
+        this.avarageCost = this.floatFix2((this.marketValue - this.FPL + this.lastFPL) / this.positionNow)
+      } {
+        this.lastFPL = this.FPL
+      }
+      this.posProp = null
       this.calcTotalPosition()
     },
     reset() {
       this.totalCapital = 1000000
       this.marketValue = 0
       this.FPL = 0
+      this.lastFPL = 0
       this.cash = 1000000
       this.priceNow = null
       this.positionNow = 0
