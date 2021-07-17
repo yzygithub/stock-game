@@ -1,9 +1,15 @@
 <template>
   <el-dialog title="获取K线" :visible.sync="visible" @close="DialogClose" width="450px">
-    <el-alert title="因为无法解决跨域问题，只能d打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据" type="success" :closable="false" style="margin-bottom:10px;"></el-alert>
-    <el-form ref="form" :model="form" :rules="dataRule" label-width="80px" style="width:300px;">
+    <el-alert
+      title="因为无法解决跨域问题，只能d打开新页面访问接口，获得数据 保存为json文件，再读取本地文件获得数据"
+      type="success"
+      :closable="false"
+      style="margin-bottom:10px;"
+    ></el-alert>
+    <el-form ref="form" :model="form" :rules="dataRule" label-width="80px" id="klineForm">
       <el-form-item size="small" label="股票代码" prop="symbol">
-        <el-input v-model="form.symbol" maxlength="8" show-word-limit placeholder="字母需大写"></el-input>
+        <el-input v-model="form.symbol" maxlength="8" show-word-limit placeholder="字母需大写" style="width:160px;"></el-input>
+        <el-button size="mini" @click="randomSymbol()">随机</el-button>
       </el-form-item>
       <el-form-item size="small" label="最后时间" prop="begin">
         <el-date-picker
@@ -11,7 +17,6 @@
           placeholder="选择日期"
           v-model="form.begin"
           value-format="timestamp"
-          style="width: 100%;"
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="复权类型">
@@ -48,8 +53,14 @@
     </el-upload>
   </el-dialog>
 </template>
+<style>
+.el-form-item {
+  margin-bottom: 10px !important;
+}
+</style>
 
 <script>
+import symbols from '../symbols'
 export default {
   name: "getKlineDialog",
   data() {
@@ -58,7 +69,7 @@ export default {
         symbol: 'SH000001',
         begin: 1625932800000,
         type: 'before',
-        count: 500,
+        count: 1000,
         period: 'day',
       },
       dataRule: {
@@ -76,8 +87,9 @@ export default {
   methods: {
     init() {
       this.visible = true
-      // window.open('https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SH000001&begin=1623643743317&period=day&type=before&count=-500&indicator=kline');
-
+      var date = new Date()
+      this.form.begin = date.getTime()
+      // console.log(symbols)
     },
     DialogClose() {
       this.visible = false
@@ -116,6 +128,12 @@ export default {
       }
       reader.readAsText(file.raw)
     },
+    randomSymbol() {
+      const random = Math.random()
+      const index = Math.round((symbols.length-1)*random)
+      // console.log(symbols[index][0])
+      this.form.symbol = symbols[index]
+    }
   },
 };
 </script>
