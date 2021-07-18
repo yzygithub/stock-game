@@ -1,7 +1,7 @@
 # stock-game
 Author: YZY
 一个K线训练的网页程序
-
+因为网上找不到一个带有仓位控制的K线训练游戏，所以自己写了一个。
 ## Build Setup
 
 ``` bash
