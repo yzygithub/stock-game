@@ -164,7 +164,7 @@ export default {
     init(price) {
       this.visible = true
       this.priceNow = parseFloat(price.toFixed(2))
-      this.maxPosition = Math.floor(this.cash / (this.priceNow * 100)) * 100
+      this.maxPosition = Math.floor(this.cash / ((this.priceNow + this.slippage) * (this.c_rate + 1) * 100)) * 100
       this.marketValue = parseFloat((this.positionNow * this.priceNow).toFixed(2))
       this.totalCapital = parseFloat(this.marketValue + this.cash).toFixed(2)
       this.FPL = parseFloat((this.totalCapital - this.initCapital).toFixed(2))

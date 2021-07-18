@@ -4,7 +4,7 @@
       <el-row>
         <el-button size="small" type="primary" @click="KlineDialogHandle()">获取K线</el-button>
         <el-button size="small" type="success" @click="tradeDialogHandle()">交易</el-button>
-        <el-button size="small" type="info" @click="passOne()">观望</el-button>
+        <el-button size="small" type="info" @click="passOne">观望</el-button>
         <el-button size="small" type="warning" @click="settleDialogHandle()">结算</el-button>
         <el-button size="small" type="info" plain class="right" @click="readmeDialogHandle()">说明</el-button>
       </el-row>
@@ -97,6 +97,7 @@ export default {
     const width = document.body.clientWidth
     this.klineParams.height = height - 60
     this.klineParams.width = width - 2
+    this.pressEnter()
   },
   methods: {
     handleRawData(data) {
@@ -167,6 +168,14 @@ export default {
       })
     },
     // 
+    pressEnter() {
+      document.onkeydown = (e) => {
+        if (e.keyCode == 39) {
+          console.log('enter')
+          console.log(this.passOne())
+        }
+      }
+    },
     passOne() {
       if (this.newList.length > this.position) {
         this.position += 1
